@@ -12,6 +12,7 @@ ECE_143_Project/
 └── data/
     └── filtered_reviews(1).csv # The data file containing the review data
 ```
+note: Due to the large file size of the original filtered reviews csv file, there is a trucated_filtered_reviews.csv which is shortened to be within GitHub's file limits. Due to this, you may not have similar results to the results stored on the respository. 
 
 ## How to Run the Code
 
