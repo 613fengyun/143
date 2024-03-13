@@ -19,7 +19,7 @@ To run the script, please ensure that you have Python installed on your system a
 
 1. Install the necessary Python modules using `pip` if you haven't already:
    ```
-   pip install pandas matplotlib seaborn
+   pip install pandas matplotlib seaborn nltk wordcloud
    ```
    
 2. Place the `visualization_script.py` in your project directory.
@@ -40,5 +40,7 @@ The script uses the following third-party Python modules:
 - `pandas`: A fast, powerful, flexible and easy-to-use open-source data analysis and manipulation tool.
 - `matplotlib`: A comprehensive library for creating static, animated, and interactive visualizations in Python.
 - `seaborn`: A Python data visualization library based on matplotlib, providing a high-level interface for drawing attractive and informative statistical graphics.
+- `nltk`: Python module that includes a library of stopwords which are used to filter stop words out of reviews when doing word frequency counts.
+- `wordcloud`: Visualization module that allows for creation of wordclouds while utilizing matplotlib.
 
 Please ensure these modules are installed before executing the script. If the modules are not installed, the script will not run successfully.
