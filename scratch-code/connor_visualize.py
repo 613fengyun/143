@@ -14,6 +14,11 @@ def make_wordcloud(input_dict):
     plt.axis("off")
     plt.show()
 
+#generate images
+with open("./datafile.json", 'r', encoding="UTF8") as f:
+    data_dict = json.loads(f.read())
+
+
 #Reference Source https://www.geeksforgeeks.org/plotting-multiple-bar-charts-using-matplotlib-in-python/
 def make_verfied_charts(input_dict):
     X = ["1.0", "2.0", "3.0", "4.0", "5.0"]
@@ -41,3 +46,7 @@ def make_verfied_charts(input_dict):
     ax3.pie(YCounts, labels=X2, autopct='%1.1f%%')
     fig.suptitle("Proportion of Verified Reviews")
     plt.show()
+
+
+make_wordcloud(data_dict["Word Frequencies"])
+make_verfied_charts(data_dict)
