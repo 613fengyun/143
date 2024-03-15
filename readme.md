@@ -8,9 +8,12 @@ The directory structure is as follows:
 ```
 ECE_143_Project/
 │
-├── visualization_script.py    # The main script to run the visualizations
-└── data/
-    └── filtered_reviews(1).csv # The data file containing the review data
+├── final-code/ # The Code to be used in the jupyter notebook portion and reviewed.
+│   ├── data_parser.py # Code to parse the amazon review data (not needed to run since we're using a smaller pre-processed data that could be uploaded to the GitHub repo)
+│   └── main.py # Main Code that contains the processing and visualization code.
+├── final-plots/ # Contains all of the final visualization files that ended up in use for the presentation
+├── scratch-code/ # Contains code from individual testing
+└── plots/ # Contains all of the old plots that were made during testing and processing
 ```
 note: Due to the large file size of the original filtered reviews csv file, there is a trucated_filtered_reviews.csv which is shortened to be within GitHub's file limits. Due to this, you may not have similar results to the results stored on the respository. 
 
