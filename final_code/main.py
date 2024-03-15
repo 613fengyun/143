@@ -288,7 +288,7 @@ def visualize_top_words(df, n_words=5):
         all_text = preprocess_text(all_text)
 
         # Create a WordCloud object
-        wordcloud = WordCloud(width=800, height=600).generate(all_text)
+        #wordcloud = WordCloud(width=800, height=600).generate(all_text)
 
         # Create a Counter object to count word frequencies
         word_counts = Counter(all_text.split())
@@ -300,13 +300,13 @@ def visualize_top_words(df, n_words=5):
         words, counts = zip(*top_n_words)
 
         # Create a new figure for the wordcloud
-        plt.figure()
-        plt.imshow(wordcloud, interpolation='bilinear')
-        plt.axis('off')
-        plt.title(f"Most Common Words in Reviews (Category: {category})")
-        plt.show()
+        #plt.figure()
+        #plt.imshow(wordcloud, interpolation='bilinear')
+        #plt.axis('off')
+        #plt.title(f"Most Common Words in Reviews (Category: {category})")
+        #plt.show()
         #plt.savefig(f"{category[:-5]}")
-        plt.close()
+        #plt.close()
 
         # Create a new figure for the bar chart
         plt.figure()
@@ -319,6 +319,7 @@ def visualize_top_words(df, n_words=5):
         plt.show()
         #plt.savefig(f"{category[:-5]} bar chart")
         plt.close()
+        ''' REMOVING THE RATINGS SINCE NOT USED IN THE PRESENTATION
         for rating in ratings:
             print(f'Starting with {rating} rating products for {category} category')
             filtered_df = filtered_by_category[filtered_by_category['Rating'] == rating]
@@ -362,7 +363,7 @@ def visualize_top_words(df, n_words=5):
             plt.tight_layout()
             plt.show()
             #plt.savefig(f"{category[:-5]} {rating} bar chart")
-            plt.close()
+            plt.close()'''
 
 def count_word_occurrences(text, word):
   """
@@ -402,15 +403,17 @@ def visualize_word_usage_over_ratings(df, word):
     categories = df['Source Category'].unique()
 
     ratings = list(range(1,6))
-    good_count = {}
-    not_good_count = {}
     for category in categories:
-        print(f'Starting with {category} category')
+        good_count = {}
+        not_good_count = {}
+        if word == "comfortable" and "AMAZON_FASHION" not in category:
+            continue
+        #print(f'Starting with {category} category')
         filtered_by_category = df[df['Source Category'] == category]
         if not len(filtered_by_category):
                 continue
         for rating in ratings:
-            print(f'Starting with {rating} rating products for {category} category')
+            #print(f'Starting with {rating} rating products for {category} category')
             filtered_df = filtered_by_category[filtered_by_category['Rating'] == rating]
             if not len(filtered_df):
                 continue
@@ -419,14 +422,19 @@ def visualize_word_usage_over_ratings(df, word):
             count = count_word_occurrences(all_text, word)
             good_count[rating] = count['good']
             not_good_count[rating] = count['not good']
+        
+        good_count = sorted((float(x),y) for x, y in good_count.items())
+        x_vals = [x for x, _ in good_count]
+        y_vals = [y for _, y in good_count]
+
         # Create the line graph
-        plt.plot(list(good_count.keys()), list(good_count.values()), color='blue', linestyle='-')
+        plt.plot(x_vals, y_vals, color='blue', linestyle='-')
         # plt.plot(list(not_good_count.keys()), list(not_good_count.values()), color='red', linestyle='-')
 
         # Add labels and title
         plt.xlabel('Ratings')
         plt.ylabel('Frequency of occurence of the words')
-        plt.title(f'Line Graph For Usage of Words in {category[:-5]}')
+        plt.title(f'Line Graph For Usage of {word} in {category[:-5]}')
 
         # Add grid lines
         plt.grid(True)
@@ -483,8 +491,10 @@ def sahil_main():
     filename = INPUT_CSV
     df = pd.read_csv(filename, encoding='utf-8')
     df['Review Text'] = df['Review Text'].astype(str)
-    word = 'comfortable'
+    word = 'good'
     visualize_top_words(df.copy())
+    visualize_word_usage_over_ratings(df, word)
+    word = 'comfortable'
     visualize_word_usage_over_ratings(df, word)
 
 #connor_main()
