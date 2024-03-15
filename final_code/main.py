@@ -1,18 +1,18 @@
 '''
 Main script that contains all of the parsing and graph creation. 
 '''
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
+import pandas as pd #3rd-party
+import matplotlib.pyplot as plt #3rd-party
+import seaborn as sns #3rd-party
+import numpy as np #3rd-party
 import os
 import csv
 import json
 from collections import Counter
 from wordcloud import WordCloud
 import string
-from nltk.corpus import stopwords  # Assuming NLTK is installed
-import nltk
+from nltk.corpus import stopwords  # Assuming NLTK is installed #3rd-party
+import nltk #3rd-party
 
 # File path and plots saving path
 INPUT_CSV = "truncated_filtered_reviews.csv"
@@ -92,8 +92,9 @@ def make_wordcloud(input_dict):
     # display graph
     plt.imshow(wc, interpolation="bilinear")
     plt.axis("off")
-    plt.savefig(os.path.join(plots_directory, 'all_cats_wordcloud.png'))
-    plt.close()
+    #plt.savefig(os.path.join(plots_directory, 'all_cats_wordcloud.png'))
+    plt.show()
+    #plt.close()
 
 #Reference Source https://www.geeksforgeeks.org/plotting-multiple-bar-charts-using-matplotlib-in-python/
 def make_verfied_charts(input_dict):
@@ -113,8 +114,9 @@ def make_verfied_charts(input_dict):
     fig, (ax3) = plt.subplots(1,1)
     ax3.pie(YCounts, labels=X2, autopct='%1.1f%%')
     fig.suptitle("Proportion of Verified Reviews")
-    plt.savefig(os.path.join(plots_directory, 'verified_proportions.png'))
-    plt.close()
+    #plt.savefig(os.path.join(plots_directory, 'verified_proportions.png'))
+    plt.show()
+    #plt.close()
 
     fig, (ax1, ax2) = plt.subplots(1,2)
     fig.suptitle("Counts by Verified Status")
@@ -122,8 +124,9 @@ def make_verfied_charts(input_dict):
     ax1.set_title("Verified Reviews")
     ax2.pie(YUnverified, labels=X, autopct='%1.1f%%')
     ax2.set_title("Unverified Reviews")
-    plt.savefig(os.path.join(plots_directory, 'verified_ratings.png'))
-    plt.close()
+    #plt.savefig(os.path.join(plots_directory, 'verified_ratings.png'))
+    plt.show()
+    #plt.close()
 
 '''
 ZEYU'S & LINXIAO'S TASKS
@@ -145,7 +148,8 @@ def plot_average_rating_by_price_category(data, plots_directory):
     plt.ylabel('Average Rating')
     plt.legend(title='Source Category', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
-    plt.savefig(os.path.join(plots_directory, 'average_rating_by_price_category.png'))
+    #plt.savefig(os.path.join(plots_directory, 'average_rating_by_price_category.png'))
+    plt.show()
     plt.close()
 
 def handle_price(price):
@@ -201,9 +205,10 @@ def plot_avg_and_median_prices_by_rating_for_category(category_data, plots_direc
     plt.legend()
 
     # Save the chart
-    plt.savefig(os.path.join(plots_directory, f'avg_median_prices_{category_name}.png'))
+    #plt.savefig(os.path.join(plots_directory, f'avg_median_prices_{category_name}.png'))
 
     # Close the plot to start drawing the next one
+    plt.show()
     plt.close()
 
 def plot_overall_rating_distribution(data, plots_directory):
@@ -219,9 +224,220 @@ def plot_overall_rating_distribution(data, plots_directory):
     plt.pie(ratings_counts, labels=ratings_counts.index, autopct='%1.1f%%', startangle=140)
     plt.title('Overall Ratings Distribution')
     plt.tight_layout()
-    plt.savefig(os.path.join(plots_directory, 'overall_ratings_distribution_pie.png'))
+    #plt.savefig(os.path.join(plots_directory, 'overall_ratings_distribution_pie.png'))
+    plt.show()
     plt.close()
 
+'''
+SAHIL'S TASKS
+==============================
+'''
+def preprocess_text(text):
+  """
+  Preprocesses text for better word analysis.
+
+  Args:
+      text: A string containing text to be preprocessed.
+
+  Returns:
+      A string containing the preprocessed text.
+  """
+  if len(text)>10000000:
+      text = text[:10000000]
+  # Lowercase all characters
+  text = text.lower()
+
+  # Remove punctuation (consider using a regular expression for more flexibility)
+  punc = set(string.punctuation)
+  text = "".join([char for char in text if char not in punc])
+
+  # Remove stopwords (using NLTK)
+  stop_words = set(stopwords.words('english'))
+  text = " ".join([word for word in text.split() if word not in stop_words])
+
+  # Additional preprocessing steps (optional):
+  # - Stemming or lemmatization (reduce words to their base forms)
+  # - Remove special characters or HTML tags
+
+  return text
+
+def visualize_top_words(df, n_words=5):
+    """
+    Creates bar charts and word counts showing the top n most common words for each category and also per rating.
+
+    Args:
+        df: A pandas DataFrame containing columns like 'category' and 'review_text'.
+        n_words: The number of most common words to display (default: 5).
+    """
+    filename = INPUT_CSV
+    df = pd.read_csv(filename, encoding='utf-8')
+    df['Review Text'] = df['Review Text'].astype(str)
+    categories = df['Source Category'].unique()
+
+    ratings = list(range(1,6))
+    for category in categories:
+        print(f'Starting with {category} category')
+        filtered_by_category = df[df['Source Category'] == category]
+        if not len(filtered_by_category):
+                continue
+        # Combine all review text for this category into a single string
+        all_text = " ".join(filtered_by_category['Review Text'])
+
+        # Preprocess text (optional): lowercase, remove stopwords, punctuation
+        # (consider using NLTK for advanced text processing)
+        all_text = preprocess_text(all_text)
+
+        # Create a WordCloud object
+        wordcloud = WordCloud(width=800, height=600).generate(all_text)
+
+        # Create a Counter object to count word frequencies
+        word_counts = Counter(all_text.split())
+
+        # Get the top n most common words
+        top_n_words = word_counts.most_common(n_words)
+
+        # Extract words and counts for the bar chart
+        words, counts = zip(*top_n_words)
+
+        # Create a new figure for the wordcloud
+        plt.figure()
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis('off')
+        plt.title(f"Most Common Words in Reviews (Category: {category})")
+        plt.show()
+        #plt.savefig(f"{category[:-5]}")
+        plt.close()
+
+        # Create a new figure for the bar chart
+        plt.figure()
+        plt.bar(words, counts)
+        plt.xlabel("Word")
+        plt.ylabel("Frequency")
+        plt.title(f"Top {n_words} Words in Reviews (Category: {category})")
+        plt.xticks(rotation=45, ha="right")  # Rotate x-axis labels for better readability
+        plt.tight_layout()
+        plt.show()
+        #plt.savefig(f"{category[:-5]} bar chart")
+        plt.close()
+        for rating in ratings:
+            print(f'Starting with {rating} rating products for {category} category')
+            filtered_df = filtered_by_category[filtered_by_category['Rating'] == rating]
+            if not len(filtered_df):
+                continue
+            # Combine all review text for this category into a single string
+            all_text = " ".join(filtered_df['Review Text'])
+
+            # Preprocess text (optional): lowercase, remove stopwords, punctuation
+            # (consider using NLTK for advanced text processing)
+            all_text = preprocess_text(all_text)
+
+            # Create a WordCloud object
+            wordcloud = WordCloud(width=800, height=600).generate(all_text)
+
+            # Create a Counter object to count word frequencies
+            word_counts = Counter(all_text.split())
+
+            # Get the top n most common words
+            top_n_words = word_counts.most_common(n_words)
+
+            # Extract words and counts for the bar chart
+            words, counts = zip(*top_n_words)
+
+            # Create a new figure for the wordcloud
+            plt.figure()
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis('off')
+            plt.title(f"Most Common Words in Reviews (Category: {category})")
+            plt.show()
+            #plt.savefig(f"{category[:-5]} {rating}")
+            plt.close()
+
+            # Create a new figure for the bar chart
+            plt.figure()
+            plt.bar(words, counts)
+            plt.xlabel("Word")
+            plt.ylabel("Frequency")
+            plt.title(f"Top {n_words} Words in Reviews (Category: {category})")
+            plt.xticks(rotation=45, ha="right")  # Rotate x-axis labels for better readability
+            plt.tight_layout()
+            plt.show()
+            #plt.savefig(f"{category[:-5]} {rating} bar chart")
+            plt.close()
+
+def count_word_occurrences(text, word):
+  """
+  Counts the frequency of the word "good" and the phrase "not good" in a string.
+
+  Args:
+      text: The string to analyze.
+
+  Returns:
+      A dictionary containing counts for "good", "not good", and the total number of words.
+  """
+  if len(text)>10000000:
+      text = text[:10000000]
+  word_counts = {"good": 0, "not good": 0, "total_words": 0}
+  text = text.lower()  # Convert to lowercase for case-insensitive counting
+
+  # Split the text into words
+  words = text.split()
+  word_counts["total_words"] = len(words)
+
+  # Count occurrences of "good" and "not good"
+  for i in range(len(words)):
+    if (words[i] == "not" and i + 1 < len(words) and words[i + 1] == word): #or words[i] == "bad":  # Check for "not good" phrase
+      word_counts["not good"] += 1
+    elif words[i] == word:
+      word_counts["good"] += 1
+
+  return word_counts
+
+def visualize_word_usage_over_ratings(df, word):
+    """
+    Counts
+    """
+    filename = INPUT_CSV
+    df = pd.read_csv(filename, encoding='utf-8')
+    df['Review Text'] = df['Review Text'].astype(str)
+    categories = df['Source Category'].unique()
+
+    ratings = list(range(1,6))
+    good_count = {}
+    not_good_count = {}
+    for category in categories:
+        print(f'Starting with {category} category')
+        filtered_by_category = df[df['Source Category'] == category]
+        if not len(filtered_by_category):
+                continue
+        for rating in ratings:
+            print(f'Starting with {rating} rating products for {category} category')
+            filtered_df = filtered_by_category[filtered_by_category['Rating'] == rating]
+            if not len(filtered_df):
+                continue
+            # Combine all review text for this category into a single string
+            all_text = " ".join(filtered_df['Review Text'])
+            count = count_word_occurrences(all_text, word)
+            good_count[rating] = count['good']
+            not_good_count[rating] = count['not good']
+        # Create the line graph
+        plt.plot(list(good_count.keys()), list(good_count.values()), color='blue', linestyle='-')
+        # plt.plot(list(not_good_count.keys()), list(not_good_count.values()), color='red', linestyle='-')
+
+        # Add labels and title
+        plt.xlabel('Ratings')
+        plt.ylabel('Frequency of occurence of the words')
+        plt.title(f'Line Graph For Usage of Words in {category[:-5]}')
+
+        # Add grid lines
+        plt.grid(True)
+
+        plt.show()
+        #plt.savefig(f"{category[:-5]} line chart")
+        plt.close()
+
+'''
+MAIN FUNCTIONS
+'''
 
 def zeyu_linxiao_main():
     # ZEYU LINXIAO PROCESSING
@@ -263,5 +479,14 @@ def connor_main():
     make_verfied_charts(output)
     make_wordcloud(output["Word Frequencies"])
 
-connor_main()
-zeyu_linxiao_main()
+def sahil_main():
+    filename = INPUT_CSV
+    df = pd.read_csv(filename, encoding='utf-8')
+    df['Review Text'] = df['Review Text'].astype(str)
+    word = 'comfortable'
+    visualize_top_words(df.copy())
+    visualize_word_usage_over_ratings(df, word)
+
+#connor_main()
+#zeyu_linxiao_main()
+#sahil_main()
